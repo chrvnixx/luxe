@@ -43,7 +43,19 @@ export async function login(req, res) {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
+
+    const verifyPassword = await bcrypt.compare(password, user.password);
+
+    if (!verifyPassword) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    user.lastLogin = Date.now();
+
+    await user.save();
+
+    res.status(200).json({ user: { ...user._doc, password: undefined } });
   } catch (error) {}
 }
