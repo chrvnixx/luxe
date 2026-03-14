@@ -68,3 +68,30 @@ export async function verifyEmail(req, res) {
     console.log("Error in verify email controller", error);
   }
 }
+
+export async function login(req, res) {
+  const { email, password } = req.body;
+  try {
+    const user = User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const verifyPassword = await bcrypt.compare(password, user.password);
+
+    if (!verifyPassword) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    user.lastLogin = Date.now();
+
+    await user.save();
+
+    generateTokenAndSetCookie(res, user._id);
+
+    res.status(200).json({ message: "User logged in", user: { ...user._doc } });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+    console.log("Error in login controller", error);
+  }
+}
