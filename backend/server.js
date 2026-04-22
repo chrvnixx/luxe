@@ -1,18 +1,17 @@
-import express from "express";
-import dotenv from "dotenv";
-import authRoutes from "./routes/authRoutes.js";
 import connectDb from "./config/db.js";
+import { env } from "./config/env.js";
+import createApp from "./app.js";
 
-dotenv.config();
+const app = createApp();
 
-const port = process.env.PORT;
+async function start() {
+  await connectDb();
+  app.listen(env.PORT, () => {
+    console.log(`Server is running on port ${env.PORT}`);
+  });
+}
 
-const app = express();
-
-app.use(express.json());
-app.use("/api/auth", authRoutes);
-
-app.listen(port, () => {
-  connectDb();
-  console.log(`Server is running on port ${port}`);
+start().catch((error) => {
+  console.error("Failed to start server", error);
+  process.exit(1);
 });

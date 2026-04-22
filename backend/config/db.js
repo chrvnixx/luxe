@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-
-dotenv.config();
+import { env } from "./env.js";
 
 export default async function connectDb() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log("MongoDb has connected successfully");
+    const connection = await mongoose.connect(env.MONGODB_URI);
+    console.log(`MongoDb connected: ${connection.connection.host}`);
   } catch (error) {
-    console.log("MongoDb has run into some issues");
+    console.error("MongoDb connection error", error);
+    throw error;
   }
 }

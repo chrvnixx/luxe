@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       unique: true,
       required: [true, "Input your email here"],
+      lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -18,6 +20,11 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, "INput your phone number here"],
+    },
+    role: {
+      type: String,
+      enum: ["customer", "admin"],
+      default: "customer",
     },
     lastLogin: {
       type: Date,
@@ -34,6 +41,18 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+userSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.password;
+    delete ret.verificationToken;
+    delete ret.verificationTokenExpiresAt;
+    delete ret.resetPasswordToken;
+    delete ret.resetPasswordTokenExpiresAt;
+    delete ret.__v;
+    return ret;
+  },
+});
 
 const User = mongoose.model("User", userSchema);
 
