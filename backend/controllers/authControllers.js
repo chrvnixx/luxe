@@ -30,9 +30,10 @@ export async function signup(req, res) {
   }
 
   const { email, name, password, phone } = parsed.data;
+  const normalizedEmail = email.toLowerCase().trim();
 
   try {
-    const userAlreadyExists = await User.findOne({ email });
+    const userAlreadyExists = await User.findOne({ email: normalizedEmail });
 
     if (userAlreadyExists) {
       return res.status(400).json({ message: "User Already Exists" });
@@ -42,7 +43,7 @@ export async function signup(req, res) {
     const verificationToken = String(Math.floor(100000 + Math.random() * 900000));
 
     const user = new User({
-      email: email,
+      email: normalizedEmail,
       name: name,
       password: hashedPassword,
       phone: phone,
@@ -72,9 +73,10 @@ export async function verifyEmail(req, res) {
   }
 
   const { email, code } = parsed.data;
+  const normalizedEmail = email.toLowerCase().trim();
   try {
     const user = await User.findOne({
-      email,
+      email: normalizedEmail,
       verificationToken: code,
       verificationTokenExpiresAt: { $gt: Date.now() },
     });
@@ -107,8 +109,9 @@ export async function login(req, res) {
   }
 
   const { email, password } = parsed.data;
+  const normalizedEmail = email.toLowerCase().trim();
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }

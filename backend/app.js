@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 function buildCorsOptions() {
   const allowList = getCorsOriginList();
@@ -29,6 +30,7 @@ function buildCorsOptions() {
 
 export default function createApp() {
   const app = express();
+  app.disable("x-powered-by");
 
   if (env.NODE_ENV === "production") {
     app.set("trust proxy", 1);
@@ -66,10 +68,10 @@ export default function createApp() {
   app.use("/api/products", productRoutes);
   app.use("/api/cart", cartRoutes);
   app.use("/api/orders", orderRoutes);
+  app.use("/api/users", userRoutes);
 
   app.use(notFound);
   app.use(errorHandler);
 
   return app;
 }
-
